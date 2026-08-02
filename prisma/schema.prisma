@@ -1,0 +1,179 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String   @default("Admin")
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model GarageProfile {
+  id             String   @id @default(cuid())
+  name           String   @default("My Garage")
+  logoUrl        String?
+  address        String?
+  phone          String?
+  email          String?
+  currencySymbol String   @default("MVR")
+  taxRate        Float    @default(0)
+  updatedAt      DateTime @updatedAt
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  name      String
+  phone     String
+  email     String?
+  address   String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  vehicles  Vehicle[]
+  invoices  Invoice[]
+  quotations Quotation[]
+
+  @@index([name])
+  @@index([phone])
+}
+
+model Vehicle {
+  id         String    @id @default(cuid())
+  customerId String
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  makeModel  String
+  plate      String
+  year       Int?
+  createdAt  DateTime  @default(now())
+  invoices   Invoice[]
+  quotations Quotation[]
+
+  @@index([customerId])
+}
+
+model Category {
+  id   String @id @default(cuid())
+  name String @unique
+  type String // "service" or "inventory"
+}
+
+model Service {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  defaultPrice Float    @default(0)
+  category     String?
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model InventoryItem {
+  id                String   @id @default(cuid())
+  name              String
+  sku               String?  @unique
+  category          String?
+  costPrice         Float    @default(0)
+  sellingPrice      Float    @default(0)
+  quantity          Int      @default(0)
+  lowStockThreshold Int      @default(5)
+  unit              String   @default("pcs")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  number        Int           @unique
+  customerId    String
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  vehicleId     String?
+  vehicle       Vehicle?      @relation(fields: [vehicleId], references: [id])
+  date          DateTime      @default(now())
+  dueDate       DateTime?
+  subtotal      Float         @default(0)
+  discount      Float         @default(0)
+  tax           Float         @default(0)
+  total         Float         @default(0)
+  amountPaid    Float         @default(0)
+  balanceDue    Float         @default(0)
+  status        String        @default("Outstanding") // Paid | Partial | Outstanding
+  paymentMethod String?
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  lineItems     LineItem[]
+  payments      Payment[]
+
+  @@index([customerId])
+  @@index([status])
+  @@index([date])
+}
+
+model LineItem {
+  id          String  @id @default(cuid())
+  invoiceId   String?
+  invoice     Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  quotationId String?
+  quotation   Quotation? @relation(fields: [quotationId], references: [id], onDelete: Cascade)
+  kind        String  // "service" | "inventory" | "custom"
+  refId       String? // serviceId or inventoryItemId
+  name        String
+  description String?
+  quantity    Float   @default(1)
+  price       Float   @default(0)
+  lineTotal   Float   @default(0)
+
+  @@index([invoiceId])
+  @@index([quotationId])
+}
+
+model Payment {
+  id        String   @id @default(cuid())
+  invoiceId String
+  invoice   Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  amount    Float
+  date      DateTime @default(now())
+  method    String   @default("Cash")
+  createdAt DateTime @default(now())
+
+  @@index([invoiceId])
+}
+
+model Quotation {
+  id         String     @id @default(cuid())
+  number     Int        @unique
+  customerId String
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  vehicleId  String?
+  vehicle    Vehicle?   @relation(fields: [vehicleId], references: [id])
+  date       DateTime   @default(now())
+  expiryDate DateTime?
+  subtotal   Float      @default(0)
+  discount   Float      @default(0)
+  tax        Float      @default(0)
+  total      Float      @default(0)
+  status     String     @default("Draft") // Draft | Sent | Converted | Expired
+  notes      String?
+  convertedInvoiceId String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  lineItems  LineItem[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+model Counter {
+  id    String @id
+  value Int    @default(0)
+}
