@@ -1,0 +1,12 @@
+# pnpm 10+/11 reads build-script approvals and overrides from here,
+# not from the "pnpm" field in package.json.
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "@prisma/engines"
+  - prisma
+  - sharp
+  - msw
+  - esbuild
+
+overrides:
+  hono: 4.12.25

@@ -1,0 +1,7 @@
+# Rust / Tauri build artifacts
+/target/
+/gen/schemas/
+
+# Generated icons are produced locally by `tauri icon`
+# (keep app-icon.png; it is the source)
+/icons/
