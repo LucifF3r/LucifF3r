@@ -26,9 +26,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { ArrowLeftIcon, DownloadIcon, FileCheck2Icon, Trash2Icon, Loader2Icon, SendIcon } from "lucide-react"
+import { ArrowLeftIcon, DownloadIcon, FileCheck2Icon, Trash2Icon, Loader2Icon, SendIcon, PrinterIcon } from "lucide-react"
 import { toast } from "sonner"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { printPdfBlob, savePdfBlob } from "@/lib/pdf-output"
 import { setQuotationStatus, deleteQuotation, convertToInvoice } from "../actions"
 import type { GarageSettings } from "@/lib/settings"
 
@@ -93,49 +94,63 @@ export function QuotationDetail({
     })
   }
 
+  async function generatePdfBlob() {
+    const { pdf } = await import("@react-pdf/renderer")
+    const { InvoicePdf } = await import("@/components/invoice-pdf")
+    return pdf(
+      <InvoicePdf
+        data={{
+          docLabel: "QUOTATION",
+          number: quotation.number,
+          date: quotation.date,
+          dueDate: quotation.expiryDate,
+          status: quotation.status,
+          garage: {
+            name: garage.name,
+            address: garage.address,
+            phone: garage.phone,
+            logoUrl: garage.logoUrl,
+          },
+          customer: {
+            name: quotation.customer.name,
+            phone: quotation.customer.phone,
+            address: quotation.customer.address,
+          },
+          vehicle: quotation.vehicle,
+          currency,
+          lineItems: quotation.lineItems,
+          subtotal: quotation.subtotal,
+          discount: quotation.discount,
+          tax: quotation.tax,
+          total: quotation.total,
+          notes: quotation.notes,
+        }}
+      />,
+    ).toBlob()
+  }
+
   async function handleDownload() {
     setDownloading(true)
     try {
-      const { pdf } = await import("@react-pdf/renderer")
-      const { InvoicePdf } = await import("@/components/invoice-pdf")
-      const blob = await pdf(
-        <InvoicePdf
-          data={{
-            docLabel: "QUOTATION",
-            number: quotation.number,
-            date: quotation.date,
-            dueDate: quotation.expiryDate,
-            status: quotation.status,
-            garage: {
-              name: garage.name,
-              address: garage.address,
-              phone: garage.phone,
-              logoUrl: garage.logoUrl,
-            },
-            customer: {
-              name: quotation.customer.name,
-              phone: quotation.customer.phone,
-              address: quotation.customer.address,
-            },
-            vehicle: quotation.vehicle,
-            currency,
-            lineItems: quotation.lineItems,
-            subtotal: quotation.subtotal,
-            discount: quotation.discount,
-            tax: quotation.tax,
-            total: quotation.total,
-            notes: quotation.notes,
-          }}
-        />,
-      ).toBlob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `${quotation.number}.pdf`
-      a.click()
-      URL.revokeObjectURL(url)
+      const blob = await generatePdfBlob()
+      const { viaPrintDialog } = await savePdfBlob(blob, `${quotation.number}.pdf`)
+      if (viaPrintDialog) {
+        toast.info('To download, choose "Save as PDF" as the printer in the dialog.')
+      }
     } catch {
       toast.error("Could not generate PDF")
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  async function handlePrint() {
+    setDownloading(true)
+    try {
+      const blob = await generatePdfBlob()
+      await printPdfBlob(blob)
+    } catch {
+      toast.error("Could not open PDF")
     } finally {
       setDownloading(false)
     }
@@ -262,6 +277,11 @@ export function QuotationDetail({
             <Button variant="outline" onClick={handleDownload} disabled={downloading}>
               {downloading ? <Loader2Icon data-icon="inline-start" className="animate-spin" /> : <DownloadIcon data-icon="inline-start" />}
               Download PDF
+            </Button>
+
+            <Button variant="outline" onClick={handlePrint} disabled={downloading}>
+              <PrinterIcon data-icon="inline-start" />
+              Print
             </Button>
 
             {!isConverted && (

@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/select"
 import { InvoiceStatusBadge } from "@/components/invoice-status-badge"
 import { formatCurrency, formatDate } from "@/lib/format"
+import { printPdfBlob, savePdfBlob } from "@/lib/pdf-output"
 import { recordPayment, deleteInvoice } from "../actions"
 import type { PdfData } from "@/components/invoice-pdf"
 
@@ -142,12 +143,10 @@ export function InvoiceDetail({
     setDownloading(true)
     try {
       const blob = await generatePdfBlob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `Invoice-${invoice.number}.pdf`
-      a.click()
-      URL.revokeObjectURL(url)
+      const { viaPrintDialog } = await savePdfBlob(blob, `Invoice-${invoice.number}.pdf`)
+      if (viaPrintDialog) {
+        toast.info('To download, choose "Save as PDF" as the printer in the dialog.')
+      }
     } catch {
       toast.error("Could not generate PDF")
     } finally {
@@ -159,9 +158,7 @@ export function InvoiceDetail({
     setDownloading(true)
     try {
       const blob = await generatePdfBlob()
-      const url = URL.createObjectURL(blob)
-      const w = window.open(url, "_blank")
-      if (w) w.onload = () => w.print()
+      await printPdfBlob(blob)
     } catch {
       toast.error("Could not open PDF")
     } finally {
