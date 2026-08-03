@@ -110,7 +110,7 @@ export function QuotationsClient({
               </EmptyMedia>
               <EmptyTitle>No quotations found</EmptyTitle>
               <EmptyDescription>
-                Create a quotation from the New Sale screen by switching the document type to Quotation.
+                Use the New Quotation button above to create your first quotation.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
