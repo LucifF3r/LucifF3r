@@ -1,8 +1,11 @@
+import Link from "next/link"
+import { PlusIcon } from "lucide-react"
 import { prisma } from "@/lib/prisma"
 import { requireAdmin } from "@/lib/session"
 import { getGarageSettings } from "@/lib/settings"
 import { formatQuotationNumber } from "@/lib/counter"
 import { PageHeader } from "@/components/page-header"
+import { Button } from "@/components/ui/button"
 import { QuotationsClient } from "./quotations-client"
 
 export const dynamic = "force-dynamic"
@@ -30,7 +33,12 @@ export default async function QuotationsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Quotations" description="Create, track, and convert quotations into invoices." />
+      <PageHeader title="Quotations" description="Create, track, and convert quotations into invoices.">
+        <Button render={<Link href="/quotations/new" />}>
+          <PlusIcon data-icon="inline-start" />
+          New Quotation
+        </Button>
+      </PageHeader>
       <QuotationsClient quotations={rows} currency={settings.currency} />
     </div>
   )

@@ -65,15 +65,18 @@ export function NewSaleClient({
   customers: initialCustomers,
   services,
   inventory,
+  lockedDocType,
 }: {
   currency: string
   customers: Customer[]
   services: CatalogService[]
   inventory: CatalogItem[]
+  /** When set, the screen is locked to this document type and the type toggle is hidden. */
+  lockedDocType?: "invoice" | "quotation"
 }) {
   const router = useRouter()
   const [customers, setCustomers] = React.useState(initialCustomers)
-  const [docType, setDocType] = React.useState<"invoice" | "quotation">("invoice")
+  const [docType, setDocType] = React.useState<"invoice" | "quotation">(lockedDocType ?? "invoice")
 
   const [customerId, setCustomerId] = React.useState<string>("")
   const [vehicleId, setVehicleId] = React.useState<string>("")
@@ -518,23 +521,25 @@ export function NewSaleClient({
             <CardTitle className="text-base">Summary</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <ToggleGroup
-              className="w-full"
-              value={[docType]}
-              onValueChange={(v) => {
-                const next = Array.isArray(v) ? v[0] : v
-                if (next) setDocType(next as "invoice" | "quotation")
-              }}
-            >
-              <ToggleGroupItem value="invoice" className="flex-1">
-                <ReceiptIcon data-icon="inline-start" />
-                Invoice
-              </ToggleGroupItem>
-              <ToggleGroupItem value="quotation" className="flex-1">
-                <FileTextIcon data-icon="inline-start" />
-                Quotation
-              </ToggleGroupItem>
-            </ToggleGroup>
+            {!lockedDocType && (
+              <ToggleGroup
+                className="w-full"
+                value={[docType]}
+                onValueChange={(v) => {
+                  const next = Array.isArray(v) ? v[0] : v
+                  if (next) setDocType(next as "invoice" | "quotation")
+                }}
+              >
+                <ToggleGroupItem value="invoice" className="flex-1">
+                  <ReceiptIcon data-icon="inline-start" />
+                  Invoice
+                </ToggleGroupItem>
+                <ToggleGroupItem value="quotation" className="flex-1">
+                  <FileTextIcon data-icon="inline-start" />
+                  Quotation
+                </ToggleGroupItem>
+              </ToggleGroup>
+            )}
 
             <div className="flex flex-col gap-2 text-sm">
               <div className="flex items-center justify-between">
