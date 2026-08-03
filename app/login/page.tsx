@@ -3,7 +3,7 @@ import { LoginForm } from "@/components/login-form"
 import { Wrench } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "Sign in — MotoGarage POS",
+  title: "Sign in — RevlineMotors POS",
 }
 
 export default function LoginPage() {
@@ -15,7 +15,7 @@ export default function LoginPage() {
             <Wrench className="size-6" />
           </div>
           <div className="flex flex-col gap-1">
-            <h1 className="text-xl font-semibold tracking-tight">MotoGarage POS</h1>
+            <h1 className="text-xl font-semibold tracking-tight">RevlineMotors POS</h1>
             <p className="text-sm text-muted-foreground text-balance">
               Sign in to manage sales, invoices, and inventory.
             </p>

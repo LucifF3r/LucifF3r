@@ -3,7 +3,7 @@ import { getGarageSettings } from "@/lib/settings"
 import { requireAdmin } from "@/lib/session"
 import { SettingsClient } from "./settings-client"
 
-export const metadata = { title: "Settings — MotoGarage POS" }
+export const metadata = { title: "Settings — RevlineMotors POS" }
 
 export default async function SettingsPage() {
   const settings = await getGarageSettings()

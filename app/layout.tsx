@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "MotoGarage POS — Service & Sales Management",
+  title: "RevlineMotors POS — Service & Sales Management",
   description:
     "Point-of-sale and management system for motorbike repair and service garages. Invoices, quotations, inventory, customers, and reports.",
   generator: "v0.app",

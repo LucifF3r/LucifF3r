@@ -19,7 +19,7 @@ export async function getGarageSettings(): Promise<GarageSettings> {
   let profile = await prisma.garageProfile.findFirst()
   if (!profile) {
     profile = await prisma.garageProfile.create({
-      data: { name: "MotoGarage", currencySymbol: "MVR", taxRate: 0 },
+      data: { name: "RevlineMotors", currencySymbol: "MVR", taxRate: 0 },
     })
   }
   return {
