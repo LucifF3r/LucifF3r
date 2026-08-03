@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { useFormStatus } from "react-dom"
 import { login } from "@/app/login/actions"
 import { Button } from "@/components/ui/button"
@@ -20,13 +20,34 @@ function SubmitButton() {
   )
 }
 
+const LAST_EMAIL_KEY = "revline:lastLoginEmail"
+
 export function LoginForm() {
   const [errorMessage, formAction] = useActionState(login, undefined)
+  const [email, setEmail] = useState("")
+
+  // Restore the last email used on this device.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LAST_EMAIL_KEY)
+      if (saved) setEmail(saved)
+    } catch {
+      // localStorage may be unavailable; ignore.
+    }
+  }, [])
+
+  function rememberEmail() {
+    try {
+      if (email) localStorage.setItem(LAST_EMAIL_KEY, email)
+    } catch {
+      // ignore
+    }
+  }
 
   return (
     <Card>
       <CardContent className="pt-6">
-        <form action={formAction}>
+        <form action={formAction} onSubmit={rememberEmail}>
           <FieldGroup>
             {errorMessage && (
               <Alert variant="destructive">
@@ -40,10 +61,11 @@ export function LoginForm() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="admin@garage.com"
+                placeholder="you@example.com"
                 autoComplete="email"
                 required
-                defaultValue="admin@garage.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
             </Field>
             <Field>
@@ -51,9 +73,6 @@ export function LoginForm() {
               <Input id="password" name="password" type="password" autoComplete="current-password" required />
             </Field>
             <SubmitButton />
-            <p className="text-center text-xs text-muted-foreground text-balance">
-              Default login: admin@garage.com / admin123 — change it in Settings after first sign-in.
-            </p>
           </FieldGroup>
         </form>
       </CardContent>
