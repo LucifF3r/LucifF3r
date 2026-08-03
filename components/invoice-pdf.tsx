@@ -63,8 +63,28 @@ const styles = StyleSheet.create({
   grandRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6, marginTop: 4, borderTopWidth: 1, borderColor: "#e7e5e4" },
   grandText: { fontFamily: "Helvetica-Bold", fontSize: 12 },
   statusPill: { marginTop: 10, padding: 8, borderRadius: 4, backgroundColor: "#fafaf9" },
+  paymentBox: { marginTop: 16, padding: 10, borderRadius: 4, borderWidth: 1, borderColor: "#e7e5e4" },
+  bankRow: { flexDirection: "row", gap: 24, marginTop: 6 },
+  bankCol: { flex: 1 },
+  bankName: { fontFamily: "Helvetica-Bold", fontSize: 9, color: "#0c0a09" },
+  bankLine: { fontSize: 9, color: "#44403c", marginTop: 1 },
   footer: { position: "absolute", bottom: 30, left: 40, right: 40, textAlign: "center", fontSize: 8, color: "#a8a29e" },
 })
+
+const BANK_ACCOUNTS = [
+  {
+    holder: "Palm Isle Collectives",
+    account: "773-00-00-738-583",
+    bank: "Bank of Maldives",
+    currency: "MVR",
+  },
+  {
+    holder: "Palm Isle Collectives",
+    account: "9040-1400-0505-41000",
+    bank: "Maldives Islamic Bank",
+    currency: "MVR",
+  },
+]
 
 function money(n: number, c: string) {
   return `${c}${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -178,6 +198,20 @@ export function InvoicePdf({ data }: { data: PdfData }) {
             <Text style={styles.muted}>{data.notes}</Text>
           </View>
         ) : null}
+
+        <View style={styles.paymentBox} wrap={false}>
+          <Text style={styles.sectionTitle}>Payment Details</Text>
+          <View style={styles.bankRow}>
+            {BANK_ACCOUNTS.map((b, i) => (
+              <View style={styles.bankCol} key={i}>
+                <Text style={styles.bankName}>{b.bank}</Text>
+                <Text style={styles.bankLine}>Account Holder: {b.holder}</Text>
+                <Text style={styles.bankLine}>Account Number: {b.account}</Text>
+                <Text style={styles.bankLine}>Currency: {b.currency}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
 
         <Text style={styles.footer}>
           {data.garage.name} — Thank you for your business.
