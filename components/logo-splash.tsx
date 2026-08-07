@@ -76,7 +76,7 @@ export function LogoSplash() {
     >
       <video
         ref={videoRef}
-        className={`h-full w-full object-contain transition-opacity duration-500 ease-out ${
+        className={`h-full w-full object-cover transition-opacity duration-500 ease-out ${
           ready ? "opacity-100" : "opacity-0"
         }`}
         src="/asl-motors-logo-reel.mp4"
