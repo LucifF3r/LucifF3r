@@ -80,6 +80,7 @@ export function LogoSplash() {
           ready ? "opacity-100" : "opacity-0"
         }`}
         src="/asl-motors-logo-reel.mp4"
+        poster="/asl-motors-logo.png"
         muted
         playsInline
         autoPlay
@@ -90,7 +91,13 @@ export function LogoSplash() {
           setProgress(100)
           setPhase("hiding")
         }}
-        onError={() => setPhase("hiding")}
+        onError={() => {
+          // If the video can't decode, fall back to showing the static logo
+          // poster briefly instead of a blank flash, then continue to the app.
+          setReady(true)
+          setProgress(100)
+          setTimeout(() => setPhase("hiding"), 1400)
+        }}
       />
 
       {/* refined loading bar + credit near the bottom */}
