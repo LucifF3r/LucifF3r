@@ -1,13 +1,13 @@
 [package]
-name = "revlinemotors-pos"
+name = "aslmotors-pos"
 version = "1.0.0"
-description = "RevlineMotors POS"
-authors = ["RevlineMotors"]
+description = "ASL Motors POS"
+authors = ["Palm Isle Collectives"]
 edition = "2021"
 
 # The library that Tauri loads. Keep the name in sync with lib.rs.
 [lib]
-name = "revlinemotors_pos_lib"
+name = "aslmotors_pos_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

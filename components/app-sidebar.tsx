@@ -84,8 +84,9 @@ export function AppSidebar({ garageName, userName }: { garageName: string; userN
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Wrench className="size-5" />
+          <div className="flex size-9 shrink-0 items-center justify-center overflow-hidden rounded-lg">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="ASL Motors" className="size-9 object-contain" />
           </div>
           <div className="flex min-w-0 flex-col">
             <span className="truncate text-sm font-semibold leading-tight">{garageName}</span>
@@ -140,6 +141,9 @@ export function AppSidebar({ garageName, userName }: { garageName: string; userN
             Sign out
           </Button>
         </form>
+        <p className="px-2 pb-1 text-center text-[10px] leading-tight text-muted-foreground">
+          Developed by Ahsal | Palm Isle Collectives &copy; 2026
+        </p>
       </SidebarFooter>
     </Sidebar>
   )

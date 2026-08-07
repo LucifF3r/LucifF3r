@@ -20,7 +20,7 @@ function SubmitButton() {
   )
 }
 
-const LAST_EMAIL_KEY = "revline:lastLoginEmail"
+const LAST_EMAIL_KEY = "aslmotors:lastLoginEmail"
 
 export function LoginForm() {
   const [errorMessage, formAction] = useActionState(login, undefined)

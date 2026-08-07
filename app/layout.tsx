@@ -17,17 +17,24 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "RevlineMotors POS — Service & Sales Management",
+  title: "ASL Motors POS — Service & Sales Management",
   description:
     "Point-of-sale and management system for motorbike repair and service garages. Invoices, quotations, inventory, customers, and reports.",
   generator: "v0.app",
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+      { url: "/icon-light-32x32.png", type: "image/png", sizes: "32x32" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180" }],
+  },
 }
 
 export const viewport: Viewport = {
   colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: light)", color: "#da2128" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f0f0f" },
   ],
 }
 
