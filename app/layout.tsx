@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import { LogoSplash } from "@/components/logo-splash"
 import { Toaster } from "@/components/ui/sonner"
 import "./globals.css"
 
@@ -47,6 +48,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="bg-background">
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider defaultTheme="light">
+          <LogoSplash />
           {children}
           <Toaster position="top-right" richColors />
         </ThemeProvider>
