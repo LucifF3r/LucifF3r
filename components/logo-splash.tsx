@@ -3,15 +3,13 @@
 import { useEffect, useRef, useState } from "react"
 
 const SESSION_KEY = "asl:splashShown"
-// Safety fallback: if the video never fires an "ended" event, hide anyway.
-const MAX_MS = 12000
+// Total time the splash stays up before fading to the app.
+const DURATION_MS = 2600
 
 export function LogoSplash() {
   const [phase, setPhase] = useState<"init" | "visible" | "hiding" | "done">("init")
   const [progress, setProgress] = useState(0)
-  const [ready, setReady] = useState(false)
   const startedRef = useRef(false)
-  const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
     if (startedRef.current) return
@@ -38,30 +36,27 @@ export function LogoSplash() {
 
     setPhase("visible")
 
-    // Safety timeout so a stalled/blocked video can't trap the user on the splash.
-    const maxTimer = setTimeout(() => setPhase("hiding"), MAX_MS)
-    return () => clearTimeout(maxTimer)
+    // Drive the loading bar smoothly across the splash duration.
+    const start = performance.now()
+    let raf = 0
+    const tick = (now: number) => {
+      const pct = Math.min(100, ((now - start) / DURATION_MS) * 100)
+      setProgress(pct)
+      if (pct < 100) {
+        raf = requestAnimationFrame(tick)
+      }
+    }
+    raf = requestAnimationFrame(tick)
+
+    const hideTimer = setTimeout(() => setPhase("hiding"), DURATION_MS)
+
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(hideTimer)
+    }
   }, [])
 
-  // Kick off playback once the overlay is visible.
-  useEffect(() => {
-    if (phase !== "visible") return
-    const video = videoRef.current
-    if (!video) return
-    const p = video.play()
-    if (p && typeof p.catch === "function") {
-      // Autoplay may be blocked; just skip to the app in that case.
-      p.catch(() => setPhase("hiding"))
-    }
-  }, [phase])
-
   if (phase === "init" || phase === "done") return null
-
-  const handleTimeUpdate = () => {
-    const video = videoRef.current
-    if (!video || !video.duration || Number.isNaN(video.duration)) return
-    setProgress(Math.min(100, (video.currentTime / video.duration) * 100))
-  }
 
   return (
     <div
@@ -74,41 +69,19 @@ export function LogoSplash() {
         phase === "hiding" ? "splash-overlay" : ""
       }`}
     >
-      <video
-        ref={videoRef}
-        className={`h-full w-full object-cover transition-opacity duration-500 ease-out ${
-          ready ? "opacity-100" : "opacity-0"
-        }`}
-        src="/asl-motors-logo-reel.mp4"
-        poster="/asl-motors-logo.png"
-        muted
-        playsInline
-        autoPlay
-        preload="auto"
-        onLoadedData={() => setReady(true)}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={() => {
-          setProgress(100)
-          setPhase("hiding")
-        }}
-        onError={() => {
-          // If the video can't decode, fall back to showing the static logo
-          // poster briefly instead of a blank flash, then continue to the app.
-          setReady(true)
-          setProgress(100)
-          setTimeout(() => setPhase("hiding"), 1400)
-        }}
+      {/* High-resolution logo, rendered crisp on a clean white background */}
+      <img
+        src="/asl-motors-logo.png"
+        alt="ASL Motors"
+        className="splash-logo w-[min(58vw,520px)] max-w-[80vw] select-none"
+        draggable={false}
       />
 
       {/* refined loading bar + credit near the bottom */}
-      <div
-        className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-3.5 pb-[7vh] transition-opacity duration-500 ${
-          ready ? "opacity-100" : "opacity-0"
-        }`}
-      >
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-3.5 pb-[7vh]">
         <div className="h-[3px] w-48 max-w-[60vw] overflow-hidden rounded-full bg-neutral-200">
           <div
-            className="h-full rounded-full bg-primary transition-[width] duration-150 ease-linear"
+            className="h-full rounded-full bg-primary transition-[width] duration-100 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
