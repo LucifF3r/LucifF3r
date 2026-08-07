@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    revlinemotors_pos_lib::run()
+    aslmotors_pos_lib::run()
 }

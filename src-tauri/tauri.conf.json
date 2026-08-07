@@ -1,15 +1,15 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "RevlineMotors POS",
+  "productName": "ASL Motors POS",
   "version": "1.0.0",
-  "identifier": "com.revlinemotors.pos",
+  "identifier": "com.aslmotors.pos",
   "build": {
     "frontendDist": "./dist"
   },
   "app": {
     "windows": [
       {
-        "title": "RevlineMotors POS",
+        "title": "ASL Motors POS",
         "url": "https://revcycle-iota.vercel.app",
         "width": 1280,
         "height": 820,
