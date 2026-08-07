@@ -9,6 +9,7 @@ const MAX_MS = 12000
 export function LogoSplash() {
   const [phase, setPhase] = useState<"init" | "visible" | "hiding" | "done">("init")
   const [progress, setProgress] = useState(0)
+  const [ready, setReady] = useState(false)
   const startedRef = useRef(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -69,18 +70,21 @@ export function LogoSplash() {
       onAnimationEnd={(e) => {
         if (e.animationName === "splash-fade-out") setPhase("done")
       }}
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-background ${
+      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-white ${
         phase === "hiding" ? "splash-overlay" : ""
       }`}
     >
       <video
         ref={videoRef}
-        className="h-full w-full object-cover"
+        className={`h-full w-full object-contain transition-opacity duration-500 ease-out ${
+          ready ? "opacity-100" : "opacity-0"
+        }`}
         src="/asl-motors-logo-reel.mp4"
         muted
         playsInline
         autoPlay
         preload="auto"
+        onLoadedData={() => setReady(true)}
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => {
           setProgress(100)
@@ -89,15 +93,19 @@ export function LogoSplash() {
         onError={() => setPhase("hiding")}
       />
 
-      {/* loading bar + credit overlaid near the bottom */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 pb-[8vh]">
-        <div className="h-1 w-56 max-w-[70vw] overflow-hidden rounded-full bg-white/20">
+      {/* refined loading bar + credit near the bottom */}
+      <div
+        className={`pointer-events-none absolute inset-x-0 bottom-0 flex flex-col items-center gap-3.5 pb-[7vh] transition-opacity duration-500 ${
+          ready ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <div className="h-[3px] w-48 max-w-[60vw] overflow-hidden rounded-full bg-neutral-200">
           <div
             className="h-full rounded-full bg-primary transition-[width] duration-150 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs tracking-wide text-white/80 drop-shadow">
+        <p className="text-[11px] font-medium tracking-[0.12em] text-neutral-400 uppercase">
           Developed by Ahsal | Palm Isle Collectives &copy; 2026
         </p>
       </div>
